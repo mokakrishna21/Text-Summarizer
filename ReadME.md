@@ -1,60 +1,170 @@
-## TARS ChatBot
+# 🧠 BART Summarizer
 
-TARS is a conversational chatbot built with Streamlit and Groq. Inspired by the TARS robot from Interstellar, this chatbot provides a friendly and engaging experience for users.
+This project fine-tunes **Facebook’s BART (base)** model for abstractive summarization using the **SAMSum** dataset. Powered by **PyTorch Lightning**, **Hugging Face Transformers**, and **ROUGE** metrics, it delivers precise summaries of conversational text.
 
-## Features
+---
 
-- **Interactive Chat Interface**: Engage with TARS through a user-friendly chat layout.
-- **Real-time Responses**: Utilizes GROQ API to fetch and display responses instantly.
-- **Customizable Model**: Uses the Llama3-8b-8192 model for generating responses.
-- **Reset Chat**: Option to start a new chat session.
+## 🚀 Features
 
-## Setup
+- 🧾 **Trains on SAMSum**: Realistic dialogue summaries  
+- 🤖 **Fine-tunes BART-base** from HuggingFace  
+- ⚡ **Fast Training** with PyTorch Lightning  
+- 📊 **ROUGE Evaluation** for performance check  
+- 🧪 **16-bit Precision Training** enabled  
+- 💻 **CPU/GPU Compatible**
 
-### Prerequisites
+---
 
-- Python 3.7+
-- Streamlit
-- Groq API
+## 📚 Dataset
 
-### Installation
+The **SAMSum** dataset contains multi-turn dialogues and their summaries.
 
-1. **Install Required Packages**:
+Format:
 
-    ```bash
-    pip install streamlit groq
-    ```
+| dialogue | summary |
+|---------|---------|
+| "Hi, how are you?" ... | "Friends catch up." |
 
-2. **Set Up Environment Variables**:
+Ensure the dataset file `samsum-train.csv` exists in the root directory.
 
-    Create a `.env` file in the project directory with your Groq API key:
+---
 
-    ```env
-    GROQ_API_KEY=your_groq_api_key
-    ```
+## 🛠️ Getting Started
 
-### Running the Application
+### 1. Requirements
 
-1. **Start the Streamlit App**:
+- Python 3.10+
+- NVIDIA GPU recommended (or fallback to CPU)
 
-    ```bash
-    streamlit run app.py
-    ```
+### 2. Installation
 
-2. **Access the App**:
+```bash
+pip install transformers torch scikit-learn pandas pytorch-lightning datasets rouge-score evaluate
+```
 
-    Open a web browser and navigate to `http://localhost:8501` to interact with TARS.
+---
 
-## Customization
+### 3. Configuration
 
-- **Change Model**: Modify the `model_option` variable in `app.py` to use different models.
-- **Update Greeting**: Edit the initial message in the `st.session_state.messages` list for a different welcome message.
+Model & training config:
 
-## Troubleshooting
+```python
+MODEL_NAME = "facebook/bart-base"
+MAX_SOURCE_LEN = 384
+MAX_TARGET_LEN = 96
+BATCH_SIZE = 8  # Reduce for CPU
+MAX_EPOCHS = 1
+PRECISION = 16  # Use 32 for CPU
+NUM_BEAMS = 4
+NO_REPEAT_NGRAM_SIZE = 3
+```
 
-- Ensure the `.env` file contains the correct Groq API key.
-- Check your internet connection if you experience issues with responses.
+---
 
-## Contact
+### 4. Launch Training
 
-For questions or suggestions, please reach out to [mokakrishna212@gmail.com].
+```python
+trainer = pl.Trainer(
+    max_epochs=MAX_EPOCHS,
+    precision=PRECISION,
+    accumulate_grad_batches=1,
+    enable_progress_bar=True,
+    accelerator="auto",
+    devices="auto",
+)
+trainer.fit(model, train_loader, val_loader)
+```
+
+---
+
+## ✨ Inference Guide
+
+Use the function below to generate summaries:
+
+```python
+def summarize(text, model, tokenizer):
+    inputs = tokenizer(
+        text,
+        max_length=MAX_SOURCE_LEN,
+        padding='max_length',
+        truncation=True,
+        return_tensors='pt'
+    ).to(model.device)
+
+    summary_ids = model.model.generate(
+        inputs['input_ids'],
+        attention_mask=inputs['attention_mask'],
+        max_length=MAX_TARGET_LEN,
+        num_beams=NUM_BEAMS,
+        no_repeat_ngram_size=NO_REPEAT_NGRAM_SIZE,
+        early_stopping=True
+    )
+
+    return tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+```
+
+---
+
+## 📈 Sample Output
+
+**Dialogue:**
+
+> Anna: Hey! Just got back from the dentist...  
+> Mark: Sure, let’s meet at 5 at the usual spot?
+
+**Generated Summary:**
+
+> Anna had a cavity filled and asked Mark to meet for coffee.
+
+**Reference Summary:**
+
+> Anna told Mark she had a cavity filled at the dentist and suggested meeting for coffee later.
+
+**ROUGE Score:**
+
+```json
+{
+  "rouge1": 0.5238,
+  "rouge2": 0.1500,
+  "rougeL": 0.3810,
+  "rougeLsum": 0.3810
+}
+```
+
+---
+
+## ⚙️ Customization
+
+- **Change Model:**
+```python
+MODEL_NAME = "facebook/bart-large"  # Try larger versions
+```
+
+- **Adjust Training Parameters:**
+```python
+MAX_EPOCHS = 3
+BATCH_SIZE = 4  # Adjust based on memory
+```
+
+- **Change Beam Search:**
+```python
+NUM_BEAMS = 5
+```
+
+---
+
+## 🔧 Troubleshooting
+
+| Problem | Fix |
+|--------|-----|
+| ❌ CUDA Error | Reduce batch size or switch to CPU |
+| ⛔ KeyError in CSV | Ensure correct headers in dataset |
+| 📉 Low ROUGE | Train for more epochs or tune hyperparameters |
+| 🚫 Tokenizer Errors | Match tokenizer with BART model version |
+
+---
+
+## 🤝 Contribution & Contact
+
+Have feedback or want to contribute?  
+📧 Email: [mokakrishna212@gmail.com](mailto:mokakrishna212@gmail.com)
