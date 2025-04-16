@@ -1,4 +1,4 @@
-# 🧠 BART Summarizer
+#  BART Summarizer
 
 This project fine-tunes **Facebook’s BART (base)** model for abstractive summarization using the **SAMSum** dataset. Powered by **PyTorch Lightning**, **Hugging Face Transformers**, and **ROUGE** metrics, it delivers precise summaries of conversational text.
 
