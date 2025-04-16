@@ -109,7 +109,15 @@ def summarize(text, model, tokenizer):
 
 **Dialogue:**
 
-> Anna: Hey! Just got back from the dentist...  
+> Anna: Hey! Just got back from the dentist.
+> Mark: Oh no, how did it go?
+> Anna: Not too bad, just a cavity. He filled it right away.
+> Mark: That’s good. Were you in pain before?
+> Anna: Yeah, a little. It started hurting last weekend.
+> Mark: Oof. At least it’s sorted now.
+> Anna: Yep, he said I need to floss more though 
+> Mark: Classic dentist advice 
+> Anna: Haha, yeah. Anyway, want to grab coffee later?
 > Mark: Sure, let’s meet at 5 at the usual spot?
 
 **Generated Summary:**
