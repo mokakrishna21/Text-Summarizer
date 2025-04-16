@@ -141,10 +141,10 @@ def summarize(text, model, tokenizer):
 
 ```json
 {
-  "rouge1": 0.5238,
-  "rouge2": 0.1500,
-  "rougeL": 0.3810,
-  "rougeLsum": 0.3810
+  "rouge1": 0.5238, #good word overlap
+  "rouge2": 0.1500, #fair phrase-level fluency
+  "rougeL": 0.3810, #decent structural alignment
+  "rougeLsum": 0.3810 #Higher is better, but I trained for 1 epoch max train for 3-4 for better results
 }
 ```
 
