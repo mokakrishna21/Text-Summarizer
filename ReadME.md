@@ -141,9 +141,9 @@ def summarize(text, model, tokenizer):
 
 ```json
 {
-  "rouge1": 0.5238, #good word overlap
-  "rouge2": 0.1500, #fair phrase-level fluency
-  "rougeL": 0.3810, #decent structural alignment
+  "rouge1": 0.5238, #~52% of words in your generated summary match the reference summary
+  "rouge2": 0.1500, #~15% of 2-word sequences match — this measures fluency and some coherence
+  "rougeL": 0.3810, #~38% of the longest matching word sequences appear in the same order
   "rougeLsum": 0.3810 #Higher is better, but I trained for 1 epoch max. For better results, train for 3-4 Epoch.
 }
 ```
